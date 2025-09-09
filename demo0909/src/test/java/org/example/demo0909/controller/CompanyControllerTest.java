@@ -81,11 +81,34 @@ class CompanyControllerTest {
         .content(companyRequest))
       .andExpect(status().isCreated());
 
-    // 根据 ID 获取公司
     mockMvc.perform(MockMvcRequestBuilders.get("/companies/1")
         .contentType(MediaType.APPLICATION_JSON))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("company"));
+  }
+
+  @Test
+  void should_update_company_when_put_company_by_id() throws Exception {
+    String createRequest = """
+        {
+            "name": "company1"
+        }
+    """;
+    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(createRequest));
+
+    String updateRequest = """
+        {
+            "name": "company2"
+        }
+    """;
+    mockMvc.perform(MockMvcRequestBuilders.put("/companies/1")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(updateRequest))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(1))
+      .andExpect(jsonPath("$.name").value("company2"));
   }
 }

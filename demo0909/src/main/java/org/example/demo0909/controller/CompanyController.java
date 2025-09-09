@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,5 +32,12 @@ public class CompanyController {
   @GetMapping("/companies/{id}")
   public Company getCompanyById(@PathVariable int id) {
     return companies.get(id-1);
+  }
+
+  @PutMapping("/companies/{id}")
+  public Company updateCompany(@PathVariable int id, @RequestBody Company company) {
+    Company existingCompany = companies.get(id-1);
+    existingCompany.setName(company.getName());
+    return existingCompany;
   }
 }
