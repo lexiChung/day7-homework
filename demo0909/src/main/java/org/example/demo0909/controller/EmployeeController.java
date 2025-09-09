@@ -36,4 +36,9 @@ public class EmployeeController {
   public  List<Employee> getAllEmployeesByGender(@PathVariable String gender){
     return employeeList.stream().filter(employee -> employee.getGender().equals(gender)).toList();
   }
+
+  @GetMapping("/employee/{id}")
+  public  Employee getEmployee(@PathVariable int id){
+    return employeeList.get(id-1);
+  }
 }

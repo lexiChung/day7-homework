@@ -118,4 +118,25 @@ class EmployeeControllerTest {
 
   }
 
+  @Test
+  void should_return_employee_when_get_employee_given_id() throws Exception {
+    String requestBody = """
+          {
+                "name" : "jenny",
+                "age" : 18,
+                "salary" : 5000,
+                "gender" :"female"
+          }""";
+    mockMvc.perform(post("/employee")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(requestBody));
+
+    int id = 1;
+    mockMvc.perform(get("/employee/{id}",id)
+        .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$.name").value("jenny"))
+      .andExpect(jsonPath("$.age").value(18))
+      .andExpect(jsonPath("$.salary").value(5000))
+      .andExpect(jsonPath("$.gender").value("female"));
+  }
 }
