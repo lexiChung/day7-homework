@@ -1,6 +1,7 @@
 package org.example.demo0909.controller;
 
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -174,5 +175,24 @@ class EmployeeControllerTest {
         .content(requestBody1))
       .andExpect(jsonPath("$.age").value(expect.getAge()))
       .andExpect(jsonPath("$.salary").value(expect.getSalary()));
+  }
+
+  @Test
+  void should_return_204_when_delete_employee_given_id() throws Exception {
+    String requestBody = """
+          {
+                "name" : "jenny",
+                "age" : 18,
+                "salary" : 5000,
+                "gender" :"female"
+          }""";
+    mockMvc.perform(post("/employee")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(requestBody));
+
+    int id = 1;
+    mockMvc.perform(delete("/employee/{id}",id)
+        .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(status().isNoContent());
   }
 }
