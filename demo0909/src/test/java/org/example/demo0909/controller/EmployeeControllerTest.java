@@ -195,4 +195,37 @@ class EmployeeControllerTest {
         .contentType(MediaType.APPLICATION_JSON))
       .andExpect(status().isNoContent());
   }
+
+  @Test
+  void should_return_paginated_employees_when_get_employees_with_pagination() throws Exception {
+    // 添加测试数据
+    for (int i = 1; i <= 10; i++) {
+      String requestBody = String.format("""
+          {
+              "name": "employee%d",
+              "age": 25,
+              "salary": 5000,
+              "gender": "male"
+          }
+      """, i);
+      mockMvc.perform(post("/employee")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(requestBody))
+        .andExpect(status().isCreated());
+    }
+
+    // 测试分页接口
+    mockMvc.perform(get("/employees")
+        .param("page", "1")
+        .param("size", "5")
+        .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.content.length()").value(5))
+      .andExpect(jsonPath("$.content[0].name").value("employee1"))
+      .andExpect(jsonPath("$.content[4].name").value("employee5"))
+      .andExpect(jsonPath("$.page").value(1))
+      .andExpect(jsonPath("$.size").value(5))
+      .andExpect(jsonPath("$.totalElements").value(10))
+      .andExpect(jsonPath("$.totalPages").value(2));
+  }
 }

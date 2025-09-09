@@ -60,4 +60,28 @@ public class EmployeeController {
     employeeList.remove(id-1);
     return ResponseEntity.noContent().build();
   }
+
+
+  @GetMapping("/employees")
+  public Map<String, Object> getEmployeesWithPagination(
+    @RequestParam(defaultValue = "1") int page,
+    @RequestParam(defaultValue = "5") int size) {
+
+    int startIndex = (page - 1) * size;
+    int endIndex = Math.min(startIndex + size, employeeList.size());
+
+    List<Employee> pagedEmployees = new ArrayList<>();
+    if (startIndex < employeeList.size()) {
+      pagedEmployees = employeeList.subList(startIndex, endIndex);
+    }
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("content", pagedEmployees);
+    response.put("page", page);
+    response.put("size", size);
+    response.put("totalElements", employeeList.size());
+    response.put("totalPages", (int) Math.ceil((double) employeeList.size() / size));
+
+    return response;
+  }
 }
