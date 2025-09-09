@@ -67,4 +67,25 @@ class CompanyControllerTest {
       .andExpect(jsonPath("$[1].name").value("company2"))
       .andExpect(jsonPath("$[1].id").value(2));
   }
+
+  @Test
+  void should_return_company_when_get_company_by_id() throws Exception {
+    String companyRequest = """
+        {
+            "name": "company"
+        }
+    """;
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(companyRequest))
+      .andExpect(status().isCreated());
+
+    // 根据 ID 获取公司
+    mockMvc.perform(MockMvcRequestBuilders.get("/companies/1")
+        .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(1))
+      .andExpect(jsonPath("$.name").value("company"));
+  }
 }
