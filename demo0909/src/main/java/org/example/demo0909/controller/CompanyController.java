@@ -6,6 +6,7 @@ import java.util.Map;
 import org.example.demo0909.domain.Company;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,5 +40,11 @@ public class CompanyController {
     Company existingCompany = companies.get(id-1);
     existingCompany.setName(company.getName());
     return existingCompany;
+  }
+
+  @DeleteMapping("/companies/{id}")
+  public ResponseEntity<Void> deleteCompany(@PathVariable int id) {
+    companies.remove(id-1);
+    return ResponseEntity.noContent().build();
   }
 }

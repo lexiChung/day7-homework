@@ -1,6 +1,5 @@
 package org.example.demo0909.controller;
 
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,5 +109,20 @@ class CompanyControllerTest {
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
       .andExpect(jsonPath("$.name").value("company2"));
+  }
+
+  @Test
+  void should_delete_company_when_delete_company_by_id() throws Exception {
+    String companyRequest = """
+        {
+            "name": "company1"
+        }
+    """;
+    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(companyRequest));
+
+    mockMvc.perform(MockMvcRequestBuilders.delete("/companies/1"))
+      .andExpect(status().isNoContent());
   }
 }
