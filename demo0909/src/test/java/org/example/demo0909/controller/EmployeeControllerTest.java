@@ -73,5 +73,49 @@ class EmployeeControllerTest {
 
   }
 
+  @Test
+  void should_return_all_female_employee_when_get_list_given_female()throws Exception {
+    String requestBody = """
+          {
+                "name" : "jenny",
+                "age" : 18,
+                "salary" : 5000,
+                "gender" :"female"
+          }""";
+    mockMvc.perform(post("/employee")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(requestBody));
+
+    String requestBody1 = """
+          {
+                "name" : "juicy",
+                "age" : 18,
+                "salary" : 5000,
+                "gender" :"female"
+          }""";
+    mockMvc.perform(post("/employee")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(requestBody1));
+
+    List<Employee> expect = new ArrayList<>();
+    Employee employee = new Employee();
+    employee.setId(1);
+    employee.setName("jenny");
+    employee.setAge(18);
+    employee.setSalary(5000);
+    employee.setGender("female");
+    Employee employee1 = new Employee();
+    employee1.setId(2);
+    expect.add(employee);
+    expect.add(employee1);
+
+    String gender = "female";
+    mockMvc.perform(get("/list/{gender}",gender)
+        .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$.length()").value(2))
+      .andExpect(jsonPath("$[0].id").value(expect.get(0).getId()))
+      .andExpect(jsonPath("$[1].id").value(expect.get(1).getId()));
+
+  }
 
 }
