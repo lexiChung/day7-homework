@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,5 +41,14 @@ public class EmployeeController {
   @GetMapping("/employee/{id}")
   public  Employee getEmployee(@PathVariable int id){
     return employeeList.get(id-1);
+  }
+
+  @PutMapping("/employee/{id}")
+  public Employee updateEmployee(@PathVariable int id,@RequestBody EmployeeDTO employeeDTO){
+    Employee employee = new Employee();
+    BeanUtils.copyProperties(employeeDTO,employee,"id");
+    employee.setId(id);
+    employeeList.set(id-1,employee);
+    return employee;
   }
 }
