@@ -34,4 +34,37 @@ class CompanyControllerTest {
       .andExpect(jsonPath("$.id").value(1));
   }
 
+  @Test
+  void should_return_all_companies_when_get_companies() throws Exception {
+    String firstCompanyRequest = """
+        {
+            "name": "company1"
+        }
+    """;
+
+    String secondCompanyRequest = """
+        {
+            "name": "company2"
+        }
+    """;
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(firstCompanyRequest))
+      .andExpect(status().isCreated());
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(secondCompanyRequest))
+      .andExpect(status().isCreated());
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/companies")
+        .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$").isArray())
+      .andExpect(jsonPath("$.length()").value(2))
+      .andExpect(jsonPath("$[0].name").value("company1"))
+      .andExpect(jsonPath("$[0].id").value(1))
+      .andExpect(jsonPath("$[1].name").value("company2"))
+      .andExpect(jsonPath("$[1].id").value(2));
+  }
 }
