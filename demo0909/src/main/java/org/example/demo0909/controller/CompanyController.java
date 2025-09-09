@@ -1,6 +1,7 @@
 package org.example.demo0909.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.example.demo0909.domain.Company;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,5 +48,28 @@ public class CompanyController {
   public ResponseEntity<Void> deleteCompany(@PathVariable int id) {
     companies.remove(id-1);
     return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/companies/page")
+  public Map<String, Object> getCompaniesWithPagination(
+    @RequestParam(defaultValue = "1") int page,
+    @RequestParam(defaultValue = "5") int size) {
+
+    int startIndex = (page - 1) * size;
+    int endIndex = Math.min(startIndex + size, companies.size());
+
+    List<Company> pageCompanies = new ArrayList<>();
+    if (startIndex < companies.size()) {
+      pageCompanies = companies.subList(startIndex, endIndex);
+    }
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("content", pageCompanies);
+    response.put("page", page);
+    response.put("size", size);
+    response.put("totalElements", companies.size());
+    response.put("totalPages", (int) Math.ceil((double) companies.size() / size));
+
+    return response;
   }
 }

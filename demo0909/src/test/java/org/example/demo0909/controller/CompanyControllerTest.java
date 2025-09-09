@@ -125,4 +125,30 @@ class CompanyControllerTest {
     mockMvc.perform(MockMvcRequestBuilders.delete("/companies/1"))
       .andExpect(status().isNoContent());
   }
+
+  @Test
+  void should_return_first_page_companies_with_default_pagination() throws Exception {
+    for (int i = 1; i <= 8; i++) {
+      String companyRequest = String.format("""
+            {
+                "name": "company%d"
+            }
+        """, i);
+
+      mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(companyRequest))
+        .andExpect(status().isCreated());
+    }
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/companies/page?page=1&size=5")
+        .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.content").isArray())
+      .andExpect(jsonPath("$.content.length()").value(5))
+      .andExpect(jsonPath("$.page").value(1))
+      .andExpect(jsonPath("$.size").value(5))
+      .andExpect(jsonPath("$.totalElements").value(8))
+      .andExpect(jsonPath("$.totalPages").value(2));
+  }
 }
