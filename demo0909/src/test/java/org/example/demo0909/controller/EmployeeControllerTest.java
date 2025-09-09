@@ -3,6 +3,7 @@ package org.example.demo0909.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -138,5 +139,40 @@ class EmployeeControllerTest {
       .andExpect(jsonPath("$.age").value(18))
       .andExpect(jsonPath("$.salary").value(5000))
       .andExpect(jsonPath("$.gender").value("female"));
+  }
+
+  @Test
+  void should_update_employee_when_put_employee_given_id_and_employee_dto() throws Exception{
+    String requestBody = """
+          {
+                "name" : "jenny",
+                "age" : 18,
+                "salary" : 5000,
+                "gender" :"female"
+          }""";
+    mockMvc.perform(post("/employee")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(requestBody));
+
+    Employee expect = new Employee();
+    expect.setId(1);
+    expect.setName("jenny");
+    expect.setAge(20);
+    expect.setSalary(8000);
+    expect.setGender("female");
+
+    int id = 1;
+    String requestBody1 = """
+          {
+                "name" : "jenny",
+                "age" : 20,
+                "salary" : 8000,
+                "gender" :"female"
+          }""";
+    mockMvc.perform(put("/employee/{id}",id)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(requestBody1))
+      .andExpect(jsonPath("$.age").value(expect.getAge()))
+      .andExpect(jsonPath("$.salary").value(expect.getSalary()));
   }
 }
