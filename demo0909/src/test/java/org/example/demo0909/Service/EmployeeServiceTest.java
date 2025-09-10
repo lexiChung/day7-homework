@@ -63,7 +63,10 @@ class EmployeeServiceTest {
     employeeDTO.setSalary(15000);
     employeeDTO.setGender("male");
     employeeDTO.setName("jack");
-    assertThrows(CannotCreateException.class,()->{employeeService.createEmployee(employeeDTO);});
+    CannotCreateException exception = assertThrows(CannotCreateException.class, () -> {
+      employeeService.createEmployee(employeeDTO);
+    });
+    assertEquals("invalid employee cannot create",exception.getMessage());
     verify(employeeRepository,never()).save(any());
   }
 

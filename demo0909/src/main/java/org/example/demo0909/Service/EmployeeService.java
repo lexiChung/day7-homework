@@ -25,7 +25,7 @@ public class EmployeeService {
   public Map<String,Object> createEmployee(EmployeeDTO employeeDTO){
 
     if(employeeDTO.getAge() < 18) throw new EmployeeInvalidAgeException("employee age at least 18");
-    if(employeeDTO.getAge() > 30 && employeeDTO.getSalary() < 20000) throw new CannotCreateException();
+    if(employeeDTO.getAge() > 30 && employeeDTO.getSalary() < 20000) throw new CannotCreateException("invalid employee cannot create");
     Employee employee = new Employee();
     BeanUtils.copyProperties(employeeDTO,employee,"id,active");
     employee = employeeRepository.save(employee);
