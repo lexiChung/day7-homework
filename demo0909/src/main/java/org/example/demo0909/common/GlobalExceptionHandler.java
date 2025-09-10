@@ -2,6 +2,7 @@ package org.example.demo0909.common;
 
 import org.example.demo0909.Exception.CannotCreateException;
 import org.example.demo0909.Exception.EmployeeInvalidAgeException;
+import org.example.demo0909.Exception.EmployeeNotFoundException;
 import org.example.demo0909.Exception.EmployeeResignedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,6 +27,12 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(CannotCreateException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public String handleCannotCreateException(Exception e){
+    return e.getMessage();
+  }
+
+  @ExceptionHandler(EmployeeNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public String handleEmployeeNotFoundException(Exception e){
     return e.getMessage();
   }
 }

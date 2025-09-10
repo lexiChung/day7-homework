@@ -162,6 +162,10 @@ class EmployeeServiceTest {
 
   @Test
   void should_throw_Exception_when_getEmployeeById_given_invalid_id() {
-    assertThrows(EmployeeNotFoundException.class, () -> {employeeService.getEmployeeById(3);});
+    EmployeeNotFoundException exception = assertThrows(
+      EmployeeNotFoundException.class, () -> {
+        employeeService.getEmployeeById(3);
+      });
+    assertEquals("this employee not exist",exception.getMessage());
   }
 }

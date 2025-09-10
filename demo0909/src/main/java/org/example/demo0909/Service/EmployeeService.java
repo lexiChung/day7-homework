@@ -42,7 +42,7 @@ public class EmployeeService {
 
   public  Employee getEmployeeById(int id){
     Employee employeeById = employeeRepository.getEmployeeById(id);
-    if(employeeById == null) throw new EmployeeNotFoundException();
+    if(employeeById == null) throw new EmployeeNotFoundException("this employee not exist");
     return employeeById;
   }
 
