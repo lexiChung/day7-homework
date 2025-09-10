@@ -2,6 +2,7 @@ package org.example.demo0909.Service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -140,8 +141,14 @@ class EmployeeServiceTest {
     employeeDTO.setSalary(15000);
     employeeDTO.setName("jack1");
     employeeService.updateEmployee(1, employeeDTO);
+    ArgumentCaptor<EmployeeDTO> employeeDTOArgumentCaptor = ArgumentCaptor.forClass(EmployeeDTO.class);
+
     verify(employeeRepository,times(1)).getEmployeeById(1);
-    verify(employeeRepository,times(1)).updateEmployee(1,employeeDTO);
+    verify(employeeRepository,times(1)).updateEmployee(eq(1),employeeDTOArgumentCaptor.capture());
+    EmployeeDTO value = employeeDTOArgumentCaptor.getValue();
+    assertEquals(employeeDTO.getAge(),value.getAge());
+    assertEquals(employeeDTO.getSalary(),value.getSalary());
+    assertEquals(employeeDTO.getName(),value.getName());
   }
 
   @Test
