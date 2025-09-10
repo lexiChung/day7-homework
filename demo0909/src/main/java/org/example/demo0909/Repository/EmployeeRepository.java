@@ -40,7 +40,7 @@ public class EmployeeRepository {
   }
 
   public void deleteEmployee(int id){
-    employeeList.remove(id-1);
+    getEmployeeById(id).setActive(false);
   }
 
   public void clear(){
