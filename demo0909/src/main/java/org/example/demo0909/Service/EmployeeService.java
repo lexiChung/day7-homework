@@ -27,7 +27,6 @@ public class EmployeeService {
     if(employeeDTO.getAge() > 30 && employeeDTO.getSalary() < 20000) throw new CannotCreateException();
     Employee employee = new Employee();
     BeanUtils.copyProperties(employeeDTO,employee,"id,active");
-    employee.setActive(true);
     employee = employeeRepository.save(employee);
     return Map.of("id",employee.getId());
   }

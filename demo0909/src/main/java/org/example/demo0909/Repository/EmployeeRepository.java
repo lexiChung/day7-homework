@@ -12,6 +12,7 @@ public class EmployeeRepository {
 
   public Employee save(Employee employee){
     employee.setId(employeeList.size()+1);
+    employee.setActive(true);
     employeeList.add(employee);
     return employee;
   }
