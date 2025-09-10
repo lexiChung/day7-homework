@@ -96,7 +96,9 @@ class EmployeeServiceTest {
   void should_set_active_false_when_deleteEmployee_given_valid_id(){
     int id = 1;
     ResponseEntity<Void> response = employeeService.deleteEmployee(id);
-    verify(employeeRepository, times(1)).deleteEmployee(id);
+    ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
+    verify(employeeRepository, times(1)).deleteEmployee(idCaptor.capture());
+    assertEquals(id, idCaptor.getValue());
     assertEquals(ResponseEntity.noContent().build(), response);
   }
 
