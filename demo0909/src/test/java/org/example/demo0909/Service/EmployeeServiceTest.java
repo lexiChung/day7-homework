@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -82,6 +83,14 @@ class EmployeeServiceTest {
     Map<String, Object> employee1 = employeeService.createEmployee(employeeDTO);
     assertEquals(1,employee1.get("id"));
     verify(employeeRepository,times(1)).save(any());
+  }
+
+  @Test
+  void should_set_active_false_when_deleteEmployee_given_valid_id(){
+    int id = 1;
+    ResponseEntity<Void> response = employeeService.deleteEmployee(id);
+    verify(employeeRepository, times(1)).deleteEmployee(id);
+    assertEquals(ResponseEntity.noContent().build(), response);
   }
 
   @Test
