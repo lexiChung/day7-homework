@@ -10,9 +10,10 @@ import org.springframework.stereotype.Repository;
 public class EmployeeRepository {
   List<Employee> employeeList = new ArrayList<>();
 
-  public void save(Employee employee){
+  public Employee save(Employee employee){
     employee.setId(employeeList.size()+1);
     employeeList.add(employee);
+    return employee;
   }
 
   public List<Employee> getEmployeeList(){
