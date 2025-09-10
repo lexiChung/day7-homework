@@ -7,6 +7,7 @@ import java.util.Map;
 import org.example.demo0909.Exception.CannotCreateException;
 import org.example.demo0909.Exception.EmployeeInvalidAgeException;
 import org.example.demo0909.Exception.EmployeeNotFoundException;
+import org.example.demo0909.Exception.EmployeeResignedException;
 import org.example.demo0909.Repository.EmployeeRepository;
 import org.example.demo0909.domain.Employee;
 import org.example.demo0909.dto.EmployeeDTO;
@@ -46,6 +47,8 @@ public class EmployeeService {
   }
 
   public Employee updateEmployee(int id,EmployeeDTO employeeDTO){
+    Employee employeeById = employeeRepository.getEmployeeById(id);
+    if(employeeById!=null && !employeeById.isActive()) throw new EmployeeResignedException("this employee has already resigned,cannot update");
     return employeeRepository.updateEmployee(id,employeeDTO);
   }
 

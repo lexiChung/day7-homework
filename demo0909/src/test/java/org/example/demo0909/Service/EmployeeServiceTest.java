@@ -11,6 +11,7 @@ import java.util.Map;
 import org.example.demo0909.Exception.CannotCreateException;
 import org.example.demo0909.Exception.EmployeeInvalidAgeException;
 import org.example.demo0909.Exception.EmployeeNotFoundException;
+import org.example.demo0909.Exception.EmployeeResignedException;
 import org.example.demo0909.Repository.EmployeeRepository;
 import org.example.demo0909.domain.Employee;
 import org.example.demo0909.dto.EmployeeDTO;
@@ -91,6 +92,28 @@ class EmployeeServiceTest {
     ResponseEntity<Void> response = employeeService.deleteEmployee(id);
     verify(employeeRepository, times(1)).deleteEmployee(id);
     assertEquals(ResponseEntity.noContent().build(), response);
+  }
+
+  @Test
+  void should_throw_exception_when_updateEmployee_given_a_employee_active_false(){
+    Employee employee = new Employee();
+    employee.setName("jack");
+    employee.setGender("male");
+    employee.setAge(20);
+    employee.setSalary(5000);
+    employee.setId(1);
+    employee.setActive(false);
+    when(employeeRepository.getEmployeeById(1)).thenReturn(employee);
+
+    EmployeeDTO employeeDTO = new EmployeeDTO();
+    employeeDTO.setAge(29);
+    employeeDTO.setSalary(15000);
+    employeeDTO.setGender("male");
+    employeeDTO.setName("jack");
+
+    EmployeeResignedException exception = assertThrows(
+      EmployeeResignedException.class, () -> employeeService.updateEmployee(1,employeeDTO));
+    assertEquals("this employee has already resigned,cannot update",exception.getMessage());
   }
 
   @Test
