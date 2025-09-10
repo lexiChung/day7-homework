@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.example.demo0909.Exception.EmployeeInvalidAgeException;
+import org.example.demo0909.Exception.EmployeeNotFoundException;
 import org.example.demo0909.Repository.EmployeeRepository;
 import org.example.demo0909.domain.Employee;
 import org.example.demo0909.dto.EmployeeDTO;
@@ -19,6 +21,8 @@ public class EmployeeService {
   private EmployeeRepository employeeRepository;
 
   public Map<String,Object> createEmployee(EmployeeDTO employeeDTO){
+
+    if(employeeDTO.getAge() < 18) throw new EmployeeInvalidAgeException();
     Employee employee = new Employee();
     BeanUtils.copyProperties(employeeDTO,employee,"id");
     employeeRepository.save(employee);
@@ -33,8 +37,10 @@ public class EmployeeService {
     return employeeRepository.getEmployeeListByGender(gender);
   }
 
-  public  Employee getEmployee(int id){
-    return employeeRepository.getEmployeeById(id);
+  public  Employee getEmployeeById(int id){
+    Employee employeeById = employeeRepository.getEmployeeById(id);
+    if(employeeById == null) throw new EmployeeNotFoundException();
+    return employeeById;
   }
 
   public Employee updateEmployee(int id,EmployeeDTO employeeDTO){

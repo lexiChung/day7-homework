@@ -1,13 +1,11 @@
 package org.example.demo0909.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.example.demo0909.Exception.EmployeeInvalidAgeException;
 import org.example.demo0909.Service.EmployeeService;
 import org.example.demo0909.domain.Employee;
 import org.example.demo0909.dto.EmployeeDTO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +26,11 @@ public class EmployeeController {
 
   @PostMapping("/employee")
   public ResponseEntity<Map<String,Object>> createEmployee(@RequestBody EmployeeDTO employeeDTO){
-    return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employeeDTO));
+    try {
+      return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employeeDTO));
+    } catch (EmployeeInvalidAgeException e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
   }
 
   @GetMapping("/list")
@@ -42,8 +44,12 @@ public class EmployeeController {
   }
 
   @GetMapping("/employee/{id}")
-  public  Employee getEmployee(@PathVariable int id){
-    return employeeService.getEmployee(id);
+  public  ResponseEntity<Employee> getEmployeeById(@PathVariable int id){
+    try {
+      return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.getEmployeeById(id));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   @PutMapping("/employee/{id}")

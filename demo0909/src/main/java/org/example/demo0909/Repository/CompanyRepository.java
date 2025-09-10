@@ -3,7 +3,6 @@ package org.example.demo0909.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import org.example.demo0909.domain.Company;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 @Repository

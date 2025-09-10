@@ -1,6 +1,7 @@
 package org.example.demo0909.controller;
 
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import org.example.demo0909.Exception.EmployeeInvalidAgeException;
+import org.example.demo0909.Exception.EmployeeNotFoundException;
 import org.example.demo0909.Repository.EmployeeRepository;
 import org.example.demo0909.Service.EmployeeService;
 import org.example.demo0909.domain.Employee;
@@ -158,6 +161,15 @@ class EmployeeControllerTest {
       .andExpect(jsonPath("$.salary").value(5000))
       .andExpect(jsonPath("$.gender").value("female"));
   }
+
+  @Test
+  void should_return_404_when_get_employee_given_invalid_id() throws Exception {
+    int id = 1;
+    mockMvc.perform(get("/employee/{id}",id)
+      .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+  }
+
+
 
   @Test
   void should_update_employee_when_put_employee_given_id_and_employee_dto() throws Exception{
