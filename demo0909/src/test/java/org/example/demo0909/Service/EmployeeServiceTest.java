@@ -89,8 +89,14 @@ class EmployeeServiceTest {
     when(employeeRepository.save(employeeCaptor.capture())).thenReturn(employee);
 
     Map<String, Object> employee1 = employeeService.createEmployee(employeeDTO);
+    verify(employeeRepository,times(1)).save(employeeCaptor.capture());
+    Employee value = employeeCaptor.getValue();
+    assertEquals(employeeDTO.getName(),value.getName());
+    assertEquals(employeeDTO.getSalary(),value.getSalary());
+    assertEquals(employeeDTO.getGender(),value.getGender());
+    assertEquals(employeeDTO.getAge(),value.getAge());
+    assertFalse(value.isActive());
     assertEquals(1,employee1.get("id"));
-    verify(employeeRepository,times(1)).save(any());
   }
 
   @Test
