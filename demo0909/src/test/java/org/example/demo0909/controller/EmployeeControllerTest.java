@@ -96,6 +96,21 @@ class EmployeeControllerTest {
   }
 
   @Test
+  void should_return_404_when_create_given_invalid_employee() throws Exception{
+    String requestBody = """
+            {
+                  "name" : "jenny",
+                  "age" : 31,
+                  "salary" : 15000,
+                  "gender" :"female"
+            }""";
+    mockMvc.perform(post("/employee")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(requestBody))
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   void should_return_all_female_employee_when_get_list_given_female()throws Exception {
     String requestBody = """
           {
@@ -168,8 +183,6 @@ class EmployeeControllerTest {
     mockMvc.perform(get("/employee/{id}",id)
       .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
   }
-
-
 
   @Test
   void should_update_employee_when_put_employee_given_id_and_employee_dto() throws Exception{

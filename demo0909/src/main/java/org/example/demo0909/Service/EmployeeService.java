@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.example.demo0909.Exception.CannotCreateException;
 import org.example.demo0909.Exception.EmployeeInvalidAgeException;
 import org.example.demo0909.Exception.EmployeeNotFoundException;
 import org.example.demo0909.Repository.EmployeeRepository;
@@ -23,6 +24,7 @@ public class EmployeeService {
   public Map<String,Object> createEmployee(EmployeeDTO employeeDTO){
 
     if(employeeDTO.getAge() < 18) throw new EmployeeInvalidAgeException();
+    if(employeeDTO.getAge() > 30 && employeeDTO.getSalary() < 20000) throw new CannotCreateException();
     Employee employee = new Employee();
     BeanUtils.copyProperties(employeeDTO,employee,"id");
     employeeRepository.save(employee);

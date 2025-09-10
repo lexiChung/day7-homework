@@ -1,10 +1,12 @@
 package org.example.demo0909.Service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.example.demo0909.Exception.CannotCreateException;
 import org.example.demo0909.Exception.EmployeeInvalidAgeException;
 import org.example.demo0909.Exception.EmployeeNotFoundException;
 import org.example.demo0909.Repository.EmployeeRepository;
@@ -43,8 +45,8 @@ class EmployeeServiceTest {
     employeeDTO.setSalary(15000);
     employeeDTO.setGender("male");
     employeeDTO.setName("jack");
-    assertThrows(EmployeeInvalidAgeException.class,()->{employeeService.createEmployee(employeeDTO);});
-
+    assertThrows(CannotCreateException.class,()->{employeeService.createEmployee(employeeDTO);});
+    verify(employeeRepository,never());
   }
 
   @Test

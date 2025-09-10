@@ -2,6 +2,7 @@ package org.example.demo0909.controller;
 
 import java.util.List;
 import java.util.Map;
+import org.example.demo0909.Exception.CannotCreateException;
 import org.example.demo0909.Exception.EmployeeInvalidAgeException;
 import org.example.demo0909.Service.EmployeeService;
 import org.example.demo0909.domain.Employee;
@@ -28,7 +29,7 @@ public class EmployeeController {
   public ResponseEntity<Map<String,Object>> createEmployee(@RequestBody EmployeeDTO employeeDTO){
     try {
       return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employeeDTO));
-    } catch (EmployeeInvalidAgeException e) {
+    } catch (EmployeeInvalidAgeException | CannotCreateException e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
