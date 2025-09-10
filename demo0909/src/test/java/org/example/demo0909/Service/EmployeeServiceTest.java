@@ -49,8 +49,11 @@ class EmployeeServiceTest {
     employeeDTO.setSalary(5000);
     employeeDTO.setGender("male");
     employeeDTO.setName("jack");
-    assertThrows(EmployeeInvalidAgeException.class,()->{employeeService.createEmployee(employeeDTO);});
-
+    EmployeeInvalidAgeException exception = assertThrows(
+      EmployeeInvalidAgeException.class, () -> {
+        employeeService.createEmployee(employeeDTO);
+      });
+    assertEquals("employee age at least 18",exception.getMessage());
   }
 
   @Test
