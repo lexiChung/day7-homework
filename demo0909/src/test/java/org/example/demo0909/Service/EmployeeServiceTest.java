@@ -117,6 +117,26 @@ class EmployeeServiceTest {
   }
 
   @Test
+  void should_update_when_updateEmployee_given_a_employee_active_true(){
+    Employee employee = new Employee();
+    employee.setName("jack");
+    employee.setGender("male");
+    employee.setAge(20);
+    employee.setSalary(5000);
+    employee.setId(1);
+    employee.setActive(true);
+    when(employeeRepository.getEmployeeById(1)).thenReturn(employee);
+
+    EmployeeDTO employeeDTO = new EmployeeDTO();
+    employeeDTO.setAge(29);
+    employeeDTO.setSalary(15000);
+    employeeDTO.setName("jack1");
+    employeeService.updateEmployee(1, employeeDTO);
+    verify(employeeRepository,times(1)).getEmployeeById(1);
+    verify(employeeRepository,times(1)).updateEmployee(1,employeeDTO);
+  }
+
+  @Test
   void should_find_a_employee_when_getEmployeeByIdById_given_valid_id(){
     Employee employee = new Employee();
     employee.setName("jack");
@@ -133,6 +153,7 @@ class EmployeeServiceTest {
     assertEquals(employee.getGender(),findEmployee.getGender());
     verify(employeeRepository,times(1)).getEmployeeById(1);
   }
+
   @Test
   void should_throw_Exception_when_getEmployeeById_given_invalid_id() {
     assertThrows(EmployeeNotFoundException.class, () -> {employeeService.getEmployeeById(3);});
