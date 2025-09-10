@@ -3,6 +3,9 @@ package org.example.demo0909.controller;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.example.demo0909.Service.CompanyService;
+import org.example.demo0909.domain.Company;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,11 +17,21 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CompanyControllerTest {
 
   @Autowired
+  private CompanyController companyController;
+
+  @Autowired
+  private CompanyService companyService;
+
+  @Autowired
   private MockMvc mockMvc;
+
+  @BeforeEach
+  void setUp() {
+    companyService.clear();
+  }
 
   @Test
   void should_create_company_and_return_id() throws Exception {

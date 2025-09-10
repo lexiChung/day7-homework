@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.example.demo0909.Service.EmployeeService;
 import org.example.demo0909.domain.Employee;
 import org.example.demo0909.dto.EmployeeDTO;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,45 +22,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class EmployeeController {
-  private List<Employee> employeeList = new ArrayList<>();
+
+  @Autowired
+  private EmployeeService  employeeService;
 
   @PostMapping("/employee")
   public ResponseEntity<Map<String,Object>> createEmployee(@RequestBody EmployeeDTO employeeDTO){
-    Employee employee = new Employee();
-    BeanUtils.copyProperties(employeeDTO,employee,"id");
-    employee.setId(employeeList.size()+1);
-    employeeList.add(employee);
-    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id",employee.getId()));
+    return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employeeDTO));
   }
 
   @GetMapping("/list")
   public  List<Employee> getAllEmployees(){
-    return employeeList;
+    return employeeService.getAllEmployees();
   }
 
   @GetMapping("/list/{gender}")
   public  List<Employee> getAllEmployeesByGender(@PathVariable String gender){
-    return employeeList.stream().filter(employee -> employee.getGender().equals(gender)).toList();
+    return employeeService.getAllEmployeesByGender(gender);
   }
 
   @GetMapping("/employee/{id}")
   public  Employee getEmployee(@PathVariable int id){
-    return employeeList.get(id-1);
+    return employeeService.getEmployee(id);
   }
 
   @PutMapping("/employee/{id}")
   public Employee updateEmployee(@PathVariable int id,@RequestBody EmployeeDTO employeeDTO){
-    Employee employee = new Employee();
-    BeanUtils.copyProperties(employeeDTO,employee,"id");
-    employee.setId(id);
-    employeeList.set(id-1,employee);
-    return employee;
+    return employeeService.updateEmployee(id,employeeDTO);
   }
 
   @DeleteMapping("/employee/{id}")
   public ResponseEntity<Void> deleteEmployee(@PathVariable int id){
-    employeeList.remove(id-1);
-    return ResponseEntity.noContent().build();
+    return employeeService.deleteEmployee(id);
   }
 
 
@@ -66,22 +61,6 @@ public class EmployeeController {
   public Map<String, Object> getEmployeesWithPagination(
     @RequestParam(defaultValue = "1") int page,
     @RequestParam(defaultValue = "5") int size) {
-
-    int startIndex = (page - 1) * size;
-    int endIndex = Math.min(startIndex + size, employeeList.size());
-
-    List<Employee> pagedEmployees = new ArrayList<>();
-    if (startIndex < employeeList.size()) {
-      pagedEmployees = employeeList.subList(startIndex, endIndex);
-    }
-
-    Map<String, Object> response = new HashMap<>();
-    response.put("content", pagedEmployees);
-    response.put("page", page);
-    response.put("size", size);
-    response.put("totalElements", employeeList.size());
-    response.put("totalPages", (int) Math.ceil((double) employeeList.size() / size));
-
-    return response;
+    return employeeService.getEmployeesWithPagination(page,size);
   }
 }

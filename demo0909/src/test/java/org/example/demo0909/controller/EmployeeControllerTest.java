@@ -10,22 +10,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import org.example.demo0909.Service.EmployeeService;
 import org.example.demo0909.domain.Employee;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class EmployeeControllerTest {
 
   @Autowired
+  private EmployeeController employeeController;
+
+  @Autowired
+  private EmployeeService employeeService;
+
+  @Autowired
   private MockMvc mockMvc;
+
+  @BeforeEach
+  void setUp() {
+    employeeService.clear();
+  }
 
   @Test
   void should_create_employee_when_post_employee_given_employee_dto() throws Exception {
