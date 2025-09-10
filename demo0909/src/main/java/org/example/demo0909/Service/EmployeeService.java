@@ -4,52 +4,51 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.example.demo0909.Repository.EmployeeRepository;
 import org.example.demo0909.domain.Employee;
 import org.example.demo0909.dto.EmployeeDTO;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmployeeService {
 
-  List<Employee> employeeList = new ArrayList<>();
+  @Autowired
+  private EmployeeRepository employeeRepository;
 
   public Map<String,Object> createEmployee(EmployeeDTO employeeDTO){
     Employee employee = new Employee();
     BeanUtils.copyProperties(employeeDTO,employee,"id");
-    employee.setId(employeeList.size()+1);
-    employeeList.add(employee);
+    employeeRepository.save(employee);
     return Map.of("id",employee.getId());
   }
 
   public List<Employee> getAllEmployees(){
-    return employeeList;
+    return employeeRepository.getEmployeeList();
   }
 
   public  List<Employee> getAllEmployeesByGender(String gender){
-    return employeeList.stream().filter(employee -> employee.getGender().equals(gender)).toList();
+    return employeeRepository.getEmployeeListByGender(gender);
   }
 
   public  Employee getEmployee(int id){
-    return employeeList.get(id-1);
+    return employeeRepository.getEmployeeById(id);
   }
 
   public Employee updateEmployee(int id,EmployeeDTO employeeDTO){
-    Employee employee = new Employee();
-    BeanUtils.copyProperties(employeeDTO,employee,"id");
-    employee.setId(id);
-    employeeList.set(id-1,employee);
-    return employee;
+    return employeeRepository.updateEmployee(id,employeeDTO);
   }
 
   public ResponseEntity<Void> deleteEmployee(int id){
-    employeeList.remove(id-1);
+    employeeRepository.deleteEmployee(id);
     return ResponseEntity.noContent().build();
   }
 
   public Map<String, Object> getEmployeesWithPagination(int page, int size) {
     int startIndex = (page - 1) * size;
+    List<Employee> employeeList = employeeRepository.getEmployeeList();
     int endIndex = Math.min(startIndex + size, employeeList.size());
 
     List<Employee> pagedEmployees = new ArrayList<>();
@@ -65,9 +64,5 @@ public class EmployeeService {
     response.put("totalPages", (int) Math.ceil((double) employeeList.size() / size));
 
     return response;
-  }
-
-  public void clear(){
-    employeeList.clear();
   }
 }

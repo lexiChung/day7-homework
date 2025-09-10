@@ -3,6 +3,7 @@ package org.example.demo0909.controller;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.example.demo0909.Repository.CompanyRepository;
 import org.example.demo0909.Service.CompanyService;
 import org.example.demo0909.domain.Company;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,11 +27,14 @@ class CompanyControllerTest {
   private CompanyService companyService;
 
   @Autowired
+  private CompanyRepository companyRepository;
+
+  @Autowired
   private MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
-    companyService.clear();
+    companyRepository.clear();
   }
 
   @Test

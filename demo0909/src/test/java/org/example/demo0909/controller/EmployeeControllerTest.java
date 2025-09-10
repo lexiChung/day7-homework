@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import org.example.demo0909.Repository.EmployeeRepository;
 import org.example.demo0909.Service.EmployeeService;
 import org.example.demo0909.domain.Employee;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,11 +32,14 @@ class EmployeeControllerTest {
   private EmployeeService employeeService;
 
   @Autowired
+  private EmployeeRepository employeeRepository;
+
+  @Autowired
   private MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
-    employeeService.clear();
+    employeeRepository.clear();
   }
 
   @Test
