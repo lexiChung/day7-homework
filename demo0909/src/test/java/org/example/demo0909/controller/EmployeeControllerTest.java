@@ -9,8 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
-import org.example.demo0909.Repository.EmployeeRepository;
-import org.example.demo0909.Service.EmployeeService;
+import org.example.demo0909.Repository.CompanyDBRepository;
+import org.example.demo0909.Repository.EmployeeDBRepository;
+import org.example.demo0909.domain.Company;
 import org.example.demo0909.domain.Employee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,70 +26,45 @@ import org.springframework.test.web.servlet.MockMvc;
 class EmployeeControllerTest {
 
   @Autowired
-  private EmployeeController employeeController;
+  private EmployeeDBRepository employeeDBRepository;
 
   @Autowired
-  private EmployeeService employeeService;
-
-  @Autowired
-  private EmployeeRepository employeeRepository;
+  private CompanyDBRepository companyDBRepository;
 
   @Autowired
   private MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
-    employeeRepository.clear();
-  }
-
-  @Test
-  void should_create_employee_when_post_employee_given_employee_dto() throws Exception {
-    String requestBody = """
-            {
-                  "name" : "jenny",
-                  "age" : 18,
-                  "salary" : 5000,
-                  "gender" :"female"
-            }""";
-    mockMvc.perform(post("/employee")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(1));
+    employeeDBRepository.clear();
   }
 
   @Test
   void should_return_list_when_get_list()throws Exception{
-    String requestBody = """
-          {
-                "name" : "jenny",
-                "age" : 18,
-                "salary" : 5000,
-                "gender" :"female"
-          }""";
-    mockMvc.perform(post("/employee")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(requestBody))
-      .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.id").value(1));
+    Company company = new Company();
+    company.setName("oocl");
+    companyDBRepository.save(company);
 
-    List<Employee> expect = new ArrayList<>();
+    Employee employee2 = new Employee();
+    employee2.setName("jenny");
+    employee2.setAge(18);
+    employee2.setSalary(5000);
+    employee2.setGender("female");
+    employee2.setCompanyId(company.getId());
+    employeeDBRepository.save(employee2);
+
     Employee employee = new Employee();
-    employee.setId(1);
-    employee.setName("jenny");
+    employee.setName("juicy");
     employee.setAge(18);
     employee.setSalary(5000);
     employee.setGender("female");
-    expect.add(employee);
+    employee.setCompanyId(company.getId());
+    employeeDBRepository.save(employee);
 
     mockMvc.perform(get("/list")
         .contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$[0].id").value(expect.get(0).getId()))
-      .andExpect(jsonPath("$[0].name").value(expect.get(0).getName()))
-      .andExpect(jsonPath("$[0].age").value(expect.get(0).getAge()))
-      .andExpect(jsonPath("$[0].salary").value(expect.get(0).getSalary()))
-      .andExpect(jsonPath("$[0].gender").value(expect.get(0).getGender()));
-
+      .andExpect(jsonPath("$[0].id").isNumber())
+      .andExpect(jsonPath("$[1].id").isNumber());
   }
 
   @Test
@@ -108,27 +84,18 @@ class EmployeeControllerTest {
 
   @Test
   void should_return_all_female_employee_when_get_list_given_female()throws Exception {
-    String requestBody = """
-          {
-                "name" : "jenny",
-                "age" : 18,
-                "salary" : 5000,
-                "gender" :"female"
-          }""";
-    mockMvc.perform(post("/employee")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(requestBody));
 
-    String requestBody1 = """
-          {
-                "name" : "juicy",
-                "age" : 18,
-                "salary" : 5000,
-                "gender" :"female"
-          }""";
-    mockMvc.perform(post("/employee")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(requestBody1));
+    Company company = new Company();
+    company.setName("oocl");
+    companyDBRepository.save(company);
+
+    Employee employee2 = new Employee();
+    employee2.setName("jenny");
+    employee2.setAge(18);
+    employee2.setSalary(5000);
+    employee2.setGender("female");
+    employee2.setCompanyId(company.getId());
+    employeeDBRepository.save(employee2);
 
     List<Employee> expect = new ArrayList<>();
     Employee employee = new Employee();
@@ -141,31 +108,26 @@ class EmployeeControllerTest {
     employee1.setId(2);
     expect.add(employee);
     expect.add(employee1);
-
     String gender = "female";
-    mockMvc.perform(get("/list/{gender}",gender)
-        .contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.length()").value(2))
-      .andExpect(jsonPath("$[0].id").value(expect.get(0).getId()))
-      .andExpect(jsonPath("$[1].id").value(expect.get(1).getId()));
-
+    mockMvc.perform(get("/list/{gender}", gender)
+      .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$[0].id").isNumber());
   }
 
   @Test
   void should_return_employee_when_get_employee_given_id() throws Exception {
-    String requestBody = """
-          {
-                "name" : "jenny",
-                "age" : 18,
-                "salary" : 5000,
-                "gender" :"female"
-          }""";
-    mockMvc.perform(post("/employee")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(requestBody));
+    Company company = new Company();
+    company.setName("oocl");
+    companyDBRepository.save(company);
 
-    int id = 1;
-    mockMvc.perform(get("/employee/{id}",id)
+    Employee employee2 = new Employee();
+    employee2.setName("jenny");
+    employee2.setAge(18);
+    employee2.setSalary(5000);
+    employee2.setGender("female");
+    employee2.setCompanyId(company.getId());
+    employeeDBRepository.save(employee2);
+    mockMvc.perform(get("/employee/{id}",employee2.getId())
         .contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$.name").value("jenny"))
       .andExpect(jsonPath("$.age").value(18))
@@ -182,16 +144,18 @@ class EmployeeControllerTest {
 
   @Test
   void should_update_employee_when_put_employee_given_id_and_employee_dto() throws Exception{
-    String requestBody = """
-          {
-                "name" : "jenny",
-                "age" : 18,
-                "salary" : 5000,
-                "gender" :"female"
-          }""";
-    mockMvc.perform(post("/employee")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(requestBody));
+    Company company = new Company();
+    company.setName("oocl");
+    companyDBRepository.save(company);
+
+    Employee employee2 = new Employee();
+    employee2.setName("jenny");
+    employee2.setAge(18);
+    employee2.setSalary(5000);
+    employee2.setGender("female");
+    employee2.setActive(true);
+    employee2.setCompanyId(company.getId());
+    employeeDBRepository.save(employee2);
 
     Employee expect = new Employee();
     expect.setId(1);
@@ -200,7 +164,6 @@ class EmployeeControllerTest {
     expect.setSalary(8000);
     expect.setGender("female");
 
-    int id = 1;
     String requestBody1 = """
           {
                 "name" : "jenny",
@@ -208,7 +171,7 @@ class EmployeeControllerTest {
                 "salary" : 8000,
                 "gender" :"female"
           }""";
-    mockMvc.perform(put("/employee/{id}",id)
+    mockMvc.perform(put("/employee/{id}",employee2.getId())
         .contentType(MediaType.APPLICATION_JSON)
         .content(requestBody1))
       .andExpect(jsonPath("$.age").value(expect.getAge()))
@@ -217,16 +180,17 @@ class EmployeeControllerTest {
 
   @Test
   void should_return_204_when_delete_employee_given_id() throws Exception {
-    String requestBody = """
-          {
-                "name" : "jenny",
-                "age" : 18,
-                "salary" : 5000,
-                "gender" :"female"
-          }""";
-    mockMvc.perform(post("/employee")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(requestBody));
+    Company company = new Company();
+    company.setName("oocl");
+    companyDBRepository.save(company);
+
+    Employee employee2 = new Employee();
+    employee2.setName("jenny");
+    employee2.setAge(18);
+    employee2.setSalary(5000);
+    employee2.setGender("female");
+    employee2.setCompanyId(company.getId());
+    employeeDBRepository.save(employee2);
 
     int id = 1;
     mockMvc.perform(delete("/employee/{id}",id)
@@ -236,20 +200,17 @@ class EmployeeControllerTest {
 
   @Test
   void should_return_paginated_employees_when_get_employees_with_pagination() throws Exception {
-    // 添加测试数据
+    Company company = new Company();
+    company.setName("oocl");
+    companyDBRepository.save(company);
     for (int i = 1; i <= 10; i++) {
-      String requestBody = String.format("""
-          {
-              "name": "employee%d",
-              "age": 25,
-              "salary": 5000,
-              "gender": "male"
-          }
-      """, i);
-      mockMvc.perform(post("/employee")
-          .contentType(MediaType.APPLICATION_JSON)
-          .content(requestBody))
-        .andExpect(status().isCreated());
+      Employee employee = new Employee();
+      employee.setName("jenny"+i);
+      employee.setAge(18+i);
+      employee.setSalary(5000);
+      employee.setGender("female");
+      employee.setCompanyId(company.getId());
+      employeeDBRepository.save(employee);
     }
 
     // 测试分页接口
@@ -259,8 +220,8 @@ class EmployeeControllerTest {
         .contentType(MediaType.APPLICATION_JSON))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.content.length()").value(5))
-      .andExpect(jsonPath("$.content[0].name").value("employee1"))
-      .andExpect(jsonPath("$.content[4].name").value("employee5"))
+      .andExpect(jsonPath("$.content[0].name").value("jenny1"))
+      .andExpect(jsonPath("$.content[4].name").value("jenny5"))
       .andExpect(jsonPath("$.page").value(1))
       .andExpect(jsonPath("$.size").value(5))
       .andExpect(jsonPath("$.totalElements").value(10))

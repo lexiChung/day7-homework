@@ -3,8 +3,9 @@ package org.example.demo0909.controller;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.example.demo0909.Repository.CompanyRepository;
-import org.example.demo0909.Service.CompanyService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+import org.example.demo0909.Repository.CompanyDBRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,132 +13,143 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class CompanyControllerTest {
-
   @Autowired
-  private CompanyController companyController;
-
-  @Autowired
-  private CompanyService companyService;
-
-  @Autowired
-  private CompanyRepository companyRepository;
+  private CompanyDBRepository companyDBRepository;
 
   @Autowired
   private MockMvc mockMvc;
 
   @BeforeEach
   void setUp() {
-    companyRepository.clear();
+    companyDBRepository.clear();
   }
 
   @Test
   void should_create_company_and_return_id() throws Exception {
     String requestBody = """
-        {
-            "name": "spring"
-        }
-    """;
+          {
+              "name": "spring"
+          }
+      """;
 
     mockMvc.perform(MockMvcRequestBuilders.post("/companies")
         .contentType(MediaType.APPLICATION_JSON)
         .content(requestBody))
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.id").value(1));
+      .andExpect(jsonPath("$.id").isNumber());
   }
 
   @Test
   void should_return_all_companies_when_get_companies() throws Exception {
     String firstCompanyRequest = """
-        {
-            "name": "company1"
-        }
-    """;
+          {
+              "name": "company1"
+          }
+      """;
 
     String secondCompanyRequest = """
-        {
-            "name": "company2"
-        }
-    """;
+          {
+              "name": "company2"
+          }
+      """;
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/companies")
         .contentType(MediaType.APPLICATION_JSON)
         .content(firstCompanyRequest))
-      .andExpect(status().isCreated());
+      .andExpect(status().isCreated()).andReturn();
+    String content = mvcResult.getResponse().getContentAsString();
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map<String, Object> response = objectMapper.readValue(content, Map.class);
+    int id1 = (Integer) response.get("id");
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+    MvcResult mvcResult1 = mockMvc.perform(MockMvcRequestBuilders.post("/companies")
         .contentType(MediaType.APPLICATION_JSON)
         .content(secondCompanyRequest))
-      .andExpect(status().isCreated());
+      .andExpect(status().isCreated()).andReturn();
+    String content1 = mvcResult1.getResponse().getContentAsString();
+    Map<String, Object> response1 = objectMapper.readValue(content1, Map.class);
+    int id2 = (Integer) response1.get("id");
 
     mockMvc.perform(MockMvcRequestBuilders.get("/companies")
         .contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$").isArray())
       .andExpect(jsonPath("$.length()").value(2))
       .andExpect(jsonPath("$[0].name").value("company1"))
-      .andExpect(jsonPath("$[0].id").value(1))
+      .andExpect(jsonPath("$[0].id").value(id1))
       .andExpect(jsonPath("$[1].name").value("company2"))
-      .andExpect(jsonPath("$[1].id").value(2));
+      .andExpect(jsonPath("$[1].id").value(id2));
   }
 
   @Test
   void should_return_company_when_get_company_by_id() throws Exception {
     String companyRequest = """
-        {
-            "name": "company"
-        }
-    """;
+          {
+              "name": "company"
+          }
+      """;
 
-    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+    MvcResult resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/companies")
         .contentType(MediaType.APPLICATION_JSON)
         .content(companyRequest))
-      .andExpect(status().isCreated());
+      .andExpect(status().isCreated())
+      .andReturn();
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/companies/1")
+    String content = resultActions.getResponse().getContentAsString();
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map<String, Object> response = objectMapper.readValue(content, Map.class);
+    int id = (Integer) response.get("id");
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/companies/" + id)
         .contentType(MediaType.APPLICATION_JSON))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(1))
+      .andExpect(jsonPath("$.id").value(id))
       .andExpect(jsonPath("$.name").value("company"));
   }
 
   @Test
   void should_update_company_when_put_company_by_id() throws Exception {
     String createRequest = """
-        {
-            "name": "company1"
-        }
-    """;
-    mockMvc.perform(MockMvcRequestBuilders.post("/companies")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(createRequest));
+          {
+              "name": "company1"
+          }
+      """;
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/companies")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(createRequest)).andReturn();
+    String content = mvcResult.getResponse().getContentAsString();
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map<String, Object> response = objectMapper.readValue(content, Map.class);
+    int id = (Integer) response.get("id");
 
     String updateRequest = """
-        {
-            "name": "company2"
-        }
-    """;
-    mockMvc.perform(MockMvcRequestBuilders.put("/companies/1")
+          {
+              "name": "company2"
+          }
+      """;
+    mockMvc.perform(MockMvcRequestBuilders.put("/companies/" + id)
         .contentType(MediaType.APPLICATION_JSON)
         .content(updateRequest))
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.id").value(1))
+      .andExpect(jsonPath("$.id").value(id))
       .andExpect(jsonPath("$.name").value("company2"));
   }
 
   @Test
   void should_delete_company_when_delete_company_by_id() throws Exception {
     String companyRequest = """
-        {
-            "name": "company1"
-        }
-    """;
+          {
+              "name": "company1"
+          }
+      """;
     mockMvc.perform(MockMvcRequestBuilders.post("/companies")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(companyRequest));
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(companyRequest));
 
     mockMvc.perform(MockMvcRequestBuilders.delete("/companies/1"))
       .andExpect(status().isNoContent());

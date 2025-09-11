@@ -14,25 +14,25 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(EmployeeResignedException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String handleEmployeeResignedException(Exception e){
+  public String handleEmployeeResignedException(Exception e) {
     return e.getMessage();
   }
 
   @ExceptionHandler(EmployeeInvalidAgeException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String handleEmployeeInvalidAgeException(Exception e){
+  public String handleEmployeeInvalidAgeException(Exception e) {
     return e.getMessage();
   }
 
   @ExceptionHandler(CannotCreateException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public String handleCannotCreateException(Exception e){
+  public String handleCannotCreateException(Exception e) {
     return e.getMessage();
   }
 
   @ExceptionHandler(EmployeeNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public String handleEmployeeNotFoundException(Exception e){
+  public String handleEmployeeNotFoundException(Exception e) {
     return e.getMessage();
   }
 }

@@ -13,10 +13,9 @@ import org.example.demo0909.Exception.CannotCreateException;
 import org.example.demo0909.Exception.EmployeeInvalidAgeException;
 import org.example.demo0909.Exception.EmployeeNotFoundException;
 import org.example.demo0909.Exception.EmployeeResignedException;
-import org.example.demo0909.Repository.EmployeeRepository;
+import org.example.demo0909.Repository.EmployeeDBRepository;
 import org.example.demo0909.domain.Employee;
 import org.example.demo0909.dto.EmployeeDTO;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class EmployeeServiceTest {
 
   @Mock
-  private EmployeeRepository employeeRepository;
+  private EmployeeDBRepository employeeRepository;
 
   @InjectMocks
   private EmployeeService employeeService;
@@ -38,13 +37,8 @@ class EmployeeServiceTest {
   @Captor
   private ArgumentCaptor<Employee> employeeCaptor;
 
-  @BeforeEach
-  void setUp() {
-    employeeRepository.clear();
-  }
-
   @Test
-  void should_throw_Exception_when_create_given_invalid_employee_age(){
+  void should_throw_Exception_when_create_given_invalid_employee_age() {
     EmployeeDTO employeeDTO = new EmployeeDTO();
     employeeDTO.setAge(17);
     employeeDTO.setSalary(5000);
@@ -54,11 +48,11 @@ class EmployeeServiceTest {
       EmployeeInvalidAgeException.class, () -> {
         employeeService.createEmployee(employeeDTO);
       });
-    assertEquals("employee age at least 18",exception.getMessage());
+    assertEquals("employee age at least 18", exception.getMessage());
   }
 
   @Test
-  void should_throw_Exception_when_create_given_employee_age_30_and_salary_below_20000(){
+  void should_throw_Exception_when_create_given_employee_age_30_and_salary_below_20000() {
     EmployeeDTO employeeDTO = new EmployeeDTO();
     employeeDTO.setAge(31);
     employeeDTO.setSalary(15000);
@@ -67,12 +61,12 @@ class EmployeeServiceTest {
     CannotCreateException exception = assertThrows(CannotCreateException.class, () -> {
       employeeService.createEmployee(employeeDTO);
     });
-    assertEquals("invalid employee cannot create",exception.getMessage());
-    verify(employeeRepository,never()).save(any());
+    assertEquals("invalid employee cannot create", exception.getMessage());
+    verify(employeeRepository, never()).save(any());
   }
 
   @Test
-  void should_set_active_to_true_when_create_given_a_valid_employee(){
+  void should_set_active_to_true_when_create_given_a_valid_employee() {
     EmployeeDTO employeeDTO = new EmployeeDTO();
     employeeDTO.setAge(29);
     employeeDTO.setSalary(15000);
@@ -89,18 +83,17 @@ class EmployeeServiceTest {
     when(employeeRepository.save(employeeCaptor.capture())).thenReturn(employee);
 
     Map<String, Object> employee1 = employeeService.createEmployee(employeeDTO);
-    verify(employeeRepository,times(1)).save(employeeCaptor.capture());
+    verify(employeeRepository, times(1)).save(employeeCaptor.capture());
     Employee value = employeeCaptor.getValue();
-    assertEquals(employeeDTO.getName(),value.getName());
-    assertEquals(employeeDTO.getSalary(),value.getSalary());
-    assertEquals(employeeDTO.getGender(),value.getGender());
-    assertEquals(employeeDTO.getAge(),value.getAge());
-    assertFalse(value.isActive());
-    assertEquals(1,employee1.get("id"));
+    assertEquals(employeeDTO.getName(), value.getName());
+    assertEquals(employeeDTO.getSalary(), value.getSalary());
+    assertEquals(employeeDTO.getGender(), value.getGender());
+    assertEquals(employeeDTO.getAge(), value.getAge());
+    assertTrue(value.isActive());
   }
 
   @Test
-  void should_set_active_false_when_deleteEmployee_given_valid_id(){
+  void should_set_active_false_when_deleteEmployee_given_valid_id() {
     int id = 1;
     ResponseEntity<Void> response = employeeService.deleteEmployee(id);
     ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -110,7 +103,7 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void should_throw_exception_when_updateEmployee_given_a_employee_active_false(){
+  void should_throw_exception_when_updateEmployee_given_a_employee_active_false() {
     Employee employee = new Employee();
     employee.setName("jack");
     employee.setGender("male");
@@ -127,12 +120,12 @@ class EmployeeServiceTest {
     employeeDTO.setName("jack");
 
     EmployeeResignedException exception = assertThrows(
-      EmployeeResignedException.class, () -> employeeService.updateEmployee(1,employeeDTO));
-    assertEquals("this employee has already resigned,cannot update",exception.getMessage());
+      EmployeeResignedException.class, () -> employeeService.updateEmployee(1, employeeDTO));
+    assertEquals("this employee has already resigned,cannot update", exception.getMessage());
   }
 
   @Test
-  void should_update_when_updateEmployee_given_a_employee_active_true(){
+  void should_update_when_updateEmployee_given_a_employee_active_true() {
     Employee employee = new Employee();
     employee.setName("jack");
     employee.setGender("male");
@@ -147,18 +140,19 @@ class EmployeeServiceTest {
     employeeDTO.setSalary(15000);
     employeeDTO.setName("jack1");
     employeeService.updateEmployee(1, employeeDTO);
-    ArgumentCaptor<EmployeeDTO> employeeDTOArgumentCaptor = ArgumentCaptor.forClass(EmployeeDTO.class);
+    ArgumentCaptor<Employee> employeeDTOArgumentCaptor = ArgumentCaptor.forClass(
+      Employee.class);
 
-    verify(employeeRepository,times(1)).getEmployeeById(1);
-    verify(employeeRepository,times(1)).updateEmployee(eq(1),employeeDTOArgumentCaptor.capture());
-    EmployeeDTO value = employeeDTOArgumentCaptor.getValue();
-    assertEquals(employeeDTO.getAge(),value.getAge());
-    assertEquals(employeeDTO.getSalary(),value.getSalary());
-    assertEquals(employeeDTO.getName(),value.getName());
+    verify(employeeRepository, times(1)).getEmployeeById(1);
+    verify(employeeRepository, times(1)).updateEmployee(eq(1), employeeDTOArgumentCaptor.capture());
+    Employee value = employeeDTOArgumentCaptor.getValue();
+    assertEquals(employeeDTO.getAge(), value.getAge());
+    assertEquals(employeeDTO.getSalary(), value.getSalary());
+    assertEquals(employeeDTO.getName(), value.getName());
   }
 
   @Test
-  void should_find_a_employee_when_getEmployeeByIdById_given_valid_id(){
+  void should_find_a_employee_when_getEmployeeByIdById_given_valid_id() {
     Employee employee = new Employee();
     employee.setName("jack");
     employee.setGender("male");
@@ -168,11 +162,11 @@ class EmployeeServiceTest {
     when(employeeRepository.getEmployeeById(1)).thenReturn(employee);
 
     Employee findEmployee = employeeService.getEmployeeById(1);
-    assertEquals(employee.getAge(),findEmployee.getAge());
-    assertEquals(employee.getId(),findEmployee.getId());
-    assertEquals(employee.getName(),findEmployee.getName());
-    assertEquals(employee.getGender(),findEmployee.getGender());
-    verify(employeeRepository,times(1)).getEmployeeById(1);
+    assertEquals(employee.getAge(), findEmployee.getAge());
+    assertEquals(employee.getId(), findEmployee.getId());
+    assertEquals(employee.getName(), findEmployee.getName());
+    assertEquals(employee.getGender(), findEmployee.getGender());
+    verify(employeeRepository, times(1)).getEmployeeById(1);
   }
 
   @Test
@@ -181,6 +175,6 @@ class EmployeeServiceTest {
       EmployeeNotFoundException.class, () -> {
         employeeService.getEmployeeById(3);
       });
-    assertEquals("this employee not exist",exception.getMessage());
+    assertEquals("this employee not exist", exception.getMessage());
   }
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/demo0909/src/main/resources/db/migration/V20250911190000__Create_table_company.sql" dialect="MySQL" />
+  </component>
+</project>
